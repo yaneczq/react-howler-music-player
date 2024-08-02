@@ -1,0 +1,101 @@
+// .full-control {
+//   padding: 1rem;
+//   border: 1px solid black;
+//   display: flex;
+//   flex-direction: column;
+//   .display {
+//     display: flex;
+//     background-color: #000000;
+//     border-radius: 0.5rem;
+//     padding: 0.5rem;
+//     height: 5rem;
+//     .progress {
+//       display: flex;
+//       color: white;
+//       margin: 0;
+//       background-color: rgb(68, 68, 68);
+//       height: 100%;
+//       width: 8rem;
+//       font-size: 2.5rem;
+//       border-radius: 0.25rem;
+//       align-items: end;
+//       justify-content: center;
+//     }
+//     .text-display {
+//       color: white;
+//       padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+//       margin: 0;
+//       .duration {
+//         background-color: #3a3a3a;
+//         padding: 0.5rem;
+//         border-radius: 0.25rem;
+//         color: white;
+//         width: 40%;
+//         display: flex;
+//         justify-content: right;
+//       }
+//       p {
+//         width: 30vw;
+//         font-size: 0.75rem;
+//         font-weight: 700;
+//         margin: 0;
+//         padding-bottom: 0.15rem;
+//       }
+//       .track-info {
+//         p {
+//           font-weight: 400;
+//           font-size: 1.25rem;
+//         }
+//         .artist {
+//           font-size: 1rem;
+//         }
+//       }
+//     }
+//   }
+//   .controls {
+//     display: flex;
+//     button {
+//       color: #2c2c2c;
+//       padding: 0.5rem;
+//       font-size: 1.5rem;
+//       display: flex;
+//       align-items: center;
+//       border: none;
+//     }&:hover {
+//       cursor: pointer;
+//     }
+//   }
+// }
+
+// .seek {
+//   label {
+
+//     display: flex;
+//     align-items: center;
+//     width: 30.5%;
+//   }
+// }
+
+.playlist {
+  margin-top: 20px;
+  h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  .playlist-item {
+    display: flex;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+
+

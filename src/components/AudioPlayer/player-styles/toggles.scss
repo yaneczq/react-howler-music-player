@@ -1,0 +1,17 @@
+.toggles {
+    
+    button {
+      background-color: $grey-100;
+      border: none;
+
+        :nth-child(1) {
+            padding: 0.45rem;
+            font-size: 1.25rem;
+
+        }
+        &:hover {
+            cursor: pointer;
+            color: $grey-250;
+        }
+    }
+}

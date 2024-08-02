@@ -1,0 +1,21 @@
+/* styles.css */
+.knob {
+  width: 100%;
+}
+
+
+.context-menu {
+  position: absolute;
+  border: 1px solid black;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.context-menu button {
+  padding: 0.5rem;
+}
+
+canvas:active {
+  cursor: none;
+}
+

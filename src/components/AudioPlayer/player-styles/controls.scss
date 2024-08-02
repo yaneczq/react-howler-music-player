@@ -1,0 +1,24 @@
+.controls {
+  background-color: $grey-100;
+  width: 10rem;
+  display: flex;
+  justify-content: space-between;
+  button {
+    background-color: $grey-100;
+    color: $grey-400;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    border: none;
+    padding: 0;
+    :nth-child(1) {
+      padding: 0.25rem;
+      font-size: 1.75rem;
+      &:hover {
+        transition: 0.1s;
+        cursor: pointer;
+        color: $grey-250;
+      }
+    }
+  }
+}
