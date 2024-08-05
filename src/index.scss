@@ -1,14 +1,8 @@
 @import './App.scss';
-@import './variables.scss';
-@import './components/AudioPlayer/player-styles/styles.scss';
-@import './components/AudioPlayer/player-styles/rate.scss';
-@import './components/AudioPlayer/player-styles/controls.scss';
-@import './components/AudioPlayer/player-styles/volume.scss';
-@import './components/AudioPlayer/player-styles/tools.scss';
-@import './components/AudioPlayer/player-styles/sorting.scss';
+@import './styles/variables.scss';
+@import './components/AudioPlayer/styles.scss';
+
+@import './styles/main.scss';
+
+@import './components/AudioPlayer/player-styles/rateandseek.scss';
 @import './components/AudioPlayer/player-styles/line.scss';
-@import './components/AudioPlayer/player-styles/toggles.scss';
-
-
-
-

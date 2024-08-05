@@ -1,5 +1,5 @@
 // src/components/AudioPlayer/Playlist.jsx
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 
 const Playlist = ({ playlist, onSelectTrack }) => {
   return (
@@ -20,12 +20,12 @@ const Playlist = ({ playlist, onSelectTrack }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 Playlist.propTypes = {
   playlist: PropTypes.array.isRequired,
   onSelectTrack: PropTypes.func.isRequired,
-};
+}
 
-export default Playlist;
+export default Playlist

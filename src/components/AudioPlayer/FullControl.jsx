@@ -1,290 +1,174 @@
-import { Component } from 'react';
-import ReactHowler from 'react-howler';
-import raf from 'raf'; // requestAnimationFrame polyfill
-import { playlist1, playlist2 } from './tracklist'; // Adjust the path as necessary
-// import Playlist from './Playlist';
-import Knob from '../Knob/Knob';
+// FullControl.js
+import { Component } from 'react'
+import ReactHowler from 'react-howler'
+import Knob from '../Knob/Knob'
+import Playlist from './Playlist' // Import the Playlist component
 
-import { IoVolumeMute, IoVolumeMedium, IoRepeat  } from "react-icons/io5";
+import { IoVolumeMute, IoVolumeMedium, IoRepeat } from 'react-icons/io5'
 import {
   CgPlayForwards,
   CgPlayBackwards,
   CgPlayPause,
   CgPlayStop,
   CgPlayButton,
-} from 'react-icons/cg';
+} from 'react-icons/cg'
+import * as Utils from './playerUtils' // Import all utility functions
+import { playlist1, playlist2 } from './tracklist'
 
 class FullControl extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       playing: false,
       loaded: false,
       loop: false,
       mute: false,
-      volume: 1.0, // Initialize with a volume of 1.0 (max)
+      volume: 0.5, // Initialize with a volume of 0.5
       seek: 0.0,
       rate: 1,
       isSeeking: false,
       currentTrackIndex: 0, // Index of the current track in the playlist
       playlist: playlist1,
+      playlist2, // Initialize with playlist1
       sortCriteria: 'tempo', // Default sort criteria
       activePlaylist: 'playlist1',
-    };
+      showPlaylist: false, // State variable to manage playlist visibility
+    }
 
-    this.handleToggle = this.handleToggle.bind(this);
-    this.handleOnLoad = this.handleOnLoad.bind(this);
-    this.handleOnEnd = this.handleOnEnd.bind(this);
-    this.handleOnPlay = this.handleOnPlay.bind(this);
-    this.handleStop = this.handleStop.bind(this);
-    this.renderSeekPos = this.renderSeekPos.bind(this);
-    this.handleLoopToggle = this.handleLoopToggle.bind(this);
-    this.handleMuteToggle = this.handleMuteToggle.bind(this);
-    this.handleMouseDownSeek = this.handleMouseDownSeek.bind(this);
-    this.handleMouseUpSeek = this.handleMouseUpSeek.bind(this);
-    this.handleSeekingChange = this.handleSeekingChange.bind(this);
-    this.handleRate = this.handleRate.bind(this);
-    this.handleSelectTrack = this.handleSelectTrack.bind(this);
-    this.handleSortChange = this.handleSortChange.bind(this);
-    this.handleVolumeChange = this.handleVolumeChange.bind(this);
-    this.handlePlaylistChange = this.handlePlaylistChange.bind(this);
+    this.handleToggle = () => Utils.handleToggle(this)
+    this.handleNextTrack = () => Utils.handleNextTrack(this)
+    this.handlePreviousTrack = () => Utils.handlePreviousTrack(this)
+    this.handleOnLoad = () => Utils.handleOnLoad(this)
+    this.handleOnPlay = () => Utils.handleOnPlay(this)
+    this.handleOnEnd = () => Utils.handleOnEnd(this)
+    this.handleStop = () => Utils.handleStop(this)
+    this.handleLoopToggle = () => Utils.handleLoopToggle(this)
+    this.handleMuteToggle = () => Utils.handleMuteToggle(this)
+    this.handleMouseDownSeek = () => Utils.handleMouseDownSeek(this)
+    this.handleMouseUpSeek = (e) => Utils.handleMouseUpSeek(this, e)
+    this.handleSeekingChange = (e) => Utils.handleSeekingChange(this, e)
+    this.handleRate = (e) => Utils.handleRate(this, e)
+    this.handleSelectTrack = (index) => Utils.handleSelectTrack(this, index)
+    this.handleSortChange = (e) => Utils.handleSortChange(this, e)
+    this.handleVolumeChange = (value) => Utils.handleVolumeChange(this, value)
+    this.handlePlaylistChange = (e) => Utils.handlePlaylistChange(this, e)
+    this.renderSeekPos = () => Utils.renderSeekPos(this)
+    this.clearRAF = () => Utils.clearRAF(this)
+
+    this.togglePlaylistVisibility = this.togglePlaylistVisibility.bind(this)
   }
 
   componentWillUnmount() {
-    this.clearRAF();
+    this.clearRAF()
   }
 
-  handleToggle() {
+  togglePlaylistVisibility() {
     this.setState((prevState) => ({
-      playing: !prevState.playing,
-    }));
-  }
-
-  handleNextTrack() {
-    this.setState((prevState) => {
-      const nextIndex =
-        (prevState.currentTrackIndex + 1) % prevState.playlist.length;
-      return { currentTrackIndex: nextIndex, loaded: false };
-    });
-  }
-
-  handlePreviousTrack() {
-    this.setState((prevState) => {
-      const prevIndex =
-        (prevState.currentTrackIndex - 1 + prevState.playlist.length) %
-        prevState.playlist.length;
-      return { currentTrackIndex: prevIndex, loaded: false };
-    });
-  }
-
-  handleOnLoad() {
-    const currentTrack = this.state.playlist[this.state.currentTrackIndex];
-    this.setState({
-      loaded: true,
-      duration: this.player.duration(),
-      trackName: currentTrack.title,
-      artist: currentTrack.artist,
-    });
-  }
-
-  handleOnPlay() {
-    this.setState({
-      playing: true,
-    });
-    this.renderSeekPos();
-  }
-
-  handleOnEnd() {
-    this.setState({
-      playing: false,
-    });
-    this.clearRAF();
-  }
-
-  handleStop() {
-    this.player.stop();
-    this.setState({
-      playing: false, // Need to update our local state so we don't immediately invoke autoplay
-    });
-    this.renderSeekPos();
-  }
-
-  handleLoopToggle() {
-    this.setState((prevState) => ({
-      loop: !prevState.loop,
-    }));
-  }
-
-  handleMuteToggle() {
-    this.setState((prevState) => ({
-      mute: !prevState.mute,
-    }));
-  }
-
-  handleMouseDownSeek() {
-    this.setState({
-      isSeeking: true,
-    });
-  }
-
-  handleMouseUpSeek(e) {
-    this.setState({
-      isSeeking: false,
-    });
-
-    this.player.seek(e.target.value);
-  }
-
-  handleSeekingChange(e) {
-    this.setState({
-      seek: parseFloat(e.target.value),
-    });
-  }
-
-  handleRate(e) {
-    const rate = parseFloat(e.target.value);
-    this.player.rate(rate);
-    this.setState({ rate });
-  }
-
-  handleSelectTrack(index) {
-    this.setState({
-      currentTrackIndex: index,
-      loaded: false,
-      playing: true,
-    });
-  }
-
-  handleSortChange(e) {
-    const sortCriteria = e.target.value;
-    this.setState((prevState) => {
-      const sortedPlaylist = [...prevState.playlist].sort((a, b) => {
-        if (a[sortCriteria] < b[sortCriteria]) return -1;
-        if (a[sortCriteria] > b[sortCriteria]) return 1;
-        return 0;
-      });
-      return { playlist: sortedPlaylist, sortCriteria };
-    });
-  }
-
-  handleVolumeChange(value) {
-    const normalizedValue = Math.min(1, Math.max(0, value / 100));
-    this.setState({ volume: normalizedValue });
-  }
-
-  handlePlaylistChange(e) {
-    const selectedPlaylist = e.target.value === 'playlist1' ? playlist1 : playlist2;
-    this.setState({
-      playlist: selectedPlaylist,
-      currentTrackIndex: 0,
-      loaded: false,
-      playing: false,
-      activePlaylist: e.target.value,
-    });
-  }
-
-  renderSeekPos() {
-    if (!this.state.isSeeking) {
-      this.setState({
-        seek: this.player.seek(),
-      });
-    }
-    if (this.state.playing) {
-      this._raf = raf(this.renderSeekPos);
-    }
-  }
-
-  clearRAF() {
-    raf.cancel(this._raf);
+      showPlaylist: !prevState.showPlaylist,
+    }))
   }
 
   render() {
-    const currentTrack = this.state.playlist[this.state.currentTrackIndex];
+    const currentTrack = this.state.playlist[this.state.currentTrackIndex]
 
     return (
-      <div className="full-control">
-        <ReactHowler
-          src={[currentTrack.src]}
-          playing={this.state.playing}
-          onLoad={this.handleOnLoad}
-          onPlay={this.handleOnPlay}
-          onEnd={this.handleOnEnd}
-          loop={this.state.loop}
-          mute={this.state.mute}
-          volume={this.state.volume}
-          ref={(ref) => (this.player = ref)}
-        />
+      <div className="wrapper">
+        <div className="line">&nbsp;</div>
 
-        {/* DISPLAY */}
-        <div className="display">
-          <div className="progress">{this.state.seek.toFixed(2)}</div>
+        <div className="full-control">
+          <ReactHowler
+            src={[currentTrack.src]}
+            playing={this.state.playing}
+            onLoad={this.handleOnLoad}
+            onPlay={this.handleOnPlay}
+            onEnd={this.handleOnEnd}
+            loop={this.state.loop}
+            mute={this.state.mute}
+            volume={this.state.volume}
+            ref={(ref) => (this.player = ref)}
+          />
 
-          <div className="text-display">
-            <p className="status">
-              {this.state.loaded ? 'NOW PLAYING' : 'Loading'}
-            </p>
-            {this.state.loaded && (
-              <div className="track-info">
-                <p>
-                  <strong>{this.state.trackName}</strong>
+          <div className="player">
+            
+            <div className="playlist-container">
+              {this.state.showPlaylist && (
+                <div className="playlist-wrapper">
+                  <Playlist
+                    playlist={this.state.playlist}
+                    onSelectTrack={this.handleSelectTrack}
+                  />
+                </div>
+              )}
+              <div className="display" onClick={this.togglePlaylistVisibility}>
+                <p className="status">
+                  {this.state.loaded ? '' : 'Loading'}
                 </p>
-                <p className="artist">{this.state.artist}</p>
+                {this.state.loaded && (
+                  <div className="track-info">
+                    <p>
+                      <strong>{currentTrack.artist} : &nbsp;</strong>
+                    </p>
+                    <p className="artist">{currentTrack.title}</p>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        <div className="seek">
-          <label>
-            Seek:
-            <span className="slider-container">
-              <input
-                type="range"
-                min="0"
-                max={this.state.duration ? this.state.duration.toFixed(2) : 0}
-                step=".01"
-                value={this.state.seek}
-                onChange={this.handleSeekingChange}
-                onMouseDown={this.handleMouseDownSeek}
-                onMouseUp={this.handleMouseUpSeek}
-              />
-            </span>
-          </label>
-        </div>
+            <div className="toggles">
+              <button onClick={this.handleLoopToggle}>
+                {this.state.loop ? <IoRepeat color="#1F80F1"/> : <IoRepeat />}
+              </button>
+              <button onClick={this.handleMuteToggle}>
+                {this.state.mute ? <IoVolumeMute /> : <IoVolumeMedium />}
+              </button>
+            </div>
 
-        {/* Sorting Controls */}
-        <div className="filter-section">
-          <div className="sorting">
-            <label>
-              <select
-                value={this.state.sortCriteria}
-                onChange={this.handleSortChange}
-              >
-                <option value="tempo">Tempo</option>
-                <option value="key">Key</option>
-                <option value="scale">Scale</option>
-              </select>
-            </label>
-          </div>
-          <div className="sorting">
-            <label>
-              <select
-                value={this.state.activePlaylist}
-                onChange={this.handlePlaylistChange}
-              >
-                <option value="playlist1">Jazhy Gen</option>
-                <option value="playlist2">23 Here</option>
-              </select>
-            </label>
-          </div>
-        </div>
+            <div className="seek">
+              {/* <div className="status">{this.state.seek.toFixed(2)}</div> */}
+              <div className="seek-container">
+                <input
+                  className="slider"
+                  type="range"
+                  min="0"
+                  max={this.state.duration ? this.state.duration.toFixed(2) : 0}
+                  step=".01"
+                  value={this.state.seek}
+                  onChange={this.handleSeekingChange}
+                  onMouseDown={this.handleMouseDownSeek}
+                  onMouseUp={this.handleMouseUpSeek}
+                />
+              </div>
+            </div>
 
-        <div className='line'>&nbsp;</div>
+            {/* <div className="filter-section">
+              <div className="sorting">
+                <label>
+                  <select
+                    value={this.state.sortCriteria}
+                    onChange={this.handleSortChange}
+                  >
+                    <option value="tempo">Tempo</option>
+                    <option value="key">Key</option>
+                    <option value="scale">Scale</option>
+                  </select>
+                </label>
+              </div>
+              <div className="sorting">
+                <label>
+                  <select
+                    value={this.state.activePlaylist}
+                    onChange={this.handlePlaylistChange}
+                  >
+                    <option value="playlist1">Jazhy Gen</option>
+                    <option value="playlist2">23 Here</option>
+                  </select>
+                </label>
+              </div>
+            </div> */}
 
-        <div className="tools">
-          <div className="section-I">
-            <div className='rate'>
+
+            {/* <div className="rate">
               <h3>Tempo</h3>
               <div className="rate-container">
                 <input
@@ -304,49 +188,27 @@ class FullControl extends Component {
                   <p>&nbsp;</p>
                 </div>
               </div>
-            </div>
+            </div> */}
+
             <div className="controls">
-              <button onClick={this.handleToggle}>
-                {this.state.playing ? <CgPlayPause /> : <CgPlayButton />}
-              </button>
-              <button onClick={this.handleStop}>
-                <CgPlayStop />
-              </button>
-              <button onClick={() => this.handlePreviousTrack()}>
-                <CgPlayBackwards />
-              </button>
-              <button onClick={() => this.handleNextTrack()}>
-                <CgPlayForwards />
-              </button>
+              <button onClick={this.handleToggle}>{this.state.playing ? <CgPlayPause /> : <CgPlayButton />}</button>
+              <button onClick={this.handleStop}> <CgPlayStop /></button>
+              <button onClick={this.handlePreviousTrack}> <CgPlayBackwards /></button>
+              <button onClick={this.handleNextTrack}> <CgPlayForwards /></button>
+            </div>
+
+            <div className="volume">
+              <Knob
+                onChange={this.handleVolumeChange}
+                startAngle={125}
+                maxAngle={285}
+              />
             </div>
           </div>
-          <div className="volume">
-            <Knob 
-            onChange={this.handleVolumeChange}
-            startAngle={125}
-            maxAngle={285}
-            />
-          </div>
         </div>
-
-        <div className='line'>&nbsp;</div>
-
-        <div className="toggles">
-          <button onClick={this.handleLoopToggle}>
-            {this.state.loop ? <IoRepeat /> : <IoRepeat color='#1F80F1' />}
-          </button>
-          <button onClick={this.handleMuteToggle}>
-            {this.state.mute ? <IoVolumeMute  /> : <IoVolumeMedium />}
-          </button>
-        </div>
-
-        {/* <Playlist 
-          playlist={this.state.playlist}
-          onSelectTrack={this.handleSelectTrack}
-        /> */}
       </div>
-    );
+    )
   }
 }
 
-export default FullControl;
+export default FullControl

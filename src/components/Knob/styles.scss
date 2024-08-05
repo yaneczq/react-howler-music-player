@@ -1,0 +1,29 @@
+/* styles.css */
+.knob {
+  display: flex;
+  align-self: center;
+
+  canvas:active {
+    cursor: none;
+  }
+
+  span {
+    display: flex;
+    align-self: center;
+  }
+}
+
+.context-menu {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000; // Ensure it is above other elements
+}
+
+.context-menu button {
+  border-radius: 0;
+  padding: 0.25rem;
+  font-size: 1rem;
+  border: none;
+}

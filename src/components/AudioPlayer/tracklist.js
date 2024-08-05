@@ -135,8 +135,7 @@ const playlist1 = [
     artist: 'Jukka',
     src: '/audio/track15.wav',
   },
-  
-];
+]
 const playlist2 = [
   {
     id: 16,
@@ -275,4 +274,4 @@ const playlist2 = [
   },
 ]
 
-export { playlist1, playlist2 };
+export { playlist1, playlist2 }
